@@ -54,9 +54,8 @@ def modify_rewards(rewards_batch):
 	return rewards_batch
 
 def set_hindsight_goal(obs_batch, goal_batch, rewards_batch, done_batch):
-	N = goal_batch.shape[0]
 	goal_dim = goal_batch.shape[1:][0]
-	goal_batch[:] = obs_batch[N][:goal_dim]
+	goal_batch[:] = obs_batch[-1][:goal_dim]
 	rewards_batch = modify_rewards(rewards_batch)
 	rewards_batch[-1] = 50.0
 	done_batch[:] = 0.0
