@@ -74,7 +74,7 @@ class DDPG(object):
 		for it in range(iterations):
 
 			# Each of these are batches 
-			state, next_state, action, reward, done = replay_buffer.sample(batch_size)
+			state_np, next_state_np, action, goal, reward, done, mask = replay_buffer.sample(batch_size) # NOTE : edit below
 			state 		= torch.FloatTensor(state).to(device)
 			action 		= torch.FloatTensor(action).to(device)
 			next_state 	= torch.FloatTensor(next_state).to(device)

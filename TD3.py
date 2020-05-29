@@ -152,7 +152,7 @@ class TD3(object):
 
         for it in range(iterations):
             # Sample replay buffer
-            x, y, u, r, d, mask = replay_buffer.sample(batch_size)
+            x, y, u, g, r, d, mask = replay_buffer.sample(batch_size) # NOTE : edit below
             state = torch.FloatTensor(x).to(device)
             action = torch.FloatTensor(u).to(device)
             next_state = torch.FloatTensor(y).to(device)

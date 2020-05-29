@@ -41,8 +41,10 @@ def load_hdf5_others(dataset, replay_buffer):
     """
     all_obs = dataset['observations']
     all_act = dataset['actions']
+    all_goals = dataset['infos/goal']
     N = min(all_obs.shape[0], 1000000)
     _obs = all_obs[:N]
+    _goals = all_goals[:N]
     _actions = all_act[:N]
     _next_obs = np.concatenate([all_obs[1:N,:], np.zeros_like(_obs[0])[np.newaxis,:]], axis=0)
     _rew = dataset['rewards'][:N]
@@ -51,6 +53,7 @@ def load_hdf5_others(dataset, replay_buffer):
     replay_buffer.storage['observations'] = _obs
     replay_buffer.storage['next_observations'] = _next_obs
     replay_buffer.storage['actions'] = _actions
+    replay_buffer.storage['goals'] = _goals
     replay_buffer.storage['rewards'] = np.expand_dims(_rew, 1)
     replay_buffer.storage['terminals'] = np.expand_dims(_done, 1)
     replay_buffer.buffer_size = N-1
@@ -112,7 +115,7 @@ def evaluate_policy_discounted(policy, eval_episodes=10):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--env_name", default="hopper-medium-v0")             # D4RL gym environment name
+    parser.add_argument("--env_name", default="maze2d-umaze-v0")              # D4RL gym environment name
     parser.add_argument("--seed", default=0, type=int)                        # Sets Gym, PyTorch and Numpy seeds
     parser.add_argument("--eval_freq", default=5e3, type=float)               # How often (time steps) we evaluate
     parser.add_argument("--max_timesteps", default=1e6, type=float)           # Max time steps to run environment for
@@ -120,7 +123,7 @@ if __name__ == "__main__":
     parser.add_argument("--lamda", default=0.5, type=float)                   # Unused parameter -- please ignore 
     parser.add_argument("--threshold", default=0.05, type=float)              # Unused parameter -- please ignore
     parser.add_argument('--use_bootstrap', default=False, type=bool)          # Whether to use bootstrapped ensembles or plain ensembles
-    parser.add_argument('--algo_name', default="BEAR", type=str)              # Which algo to run (see the options below in the main function)
+    parser.add_argument('--algo_name', default="GCBEAR", type=str)            # Which algo to run (see the options below in the main function)
     parser.add_argument('--mode', default='hardcoded', type=str)              # Whether to do automatic lagrange dual descent or manually tune coefficient of the MMD loss (prefered "auto")
     parser.add_argument('--num_samples_match', default=10, type=int)          # number of samples to do matching in MMD
     parser.add_argument('--mmd_sigma', default=20.0, type=float)              # The bandwidth of the MMD kernel parameter
@@ -133,6 +136,7 @@ if __name__ == "__main__":
     parser.add_argument('--cloning', default="False", type=str)
     parser.add_argument('--num_random', default=10, type=int)
     parser.add_argument('--margin_threshold', default=10, type=float)		  # for DQfD baseline
+    parser.add_argument('--hindsight', default=True, type=bool)               # for Goal Conditioned
     args = parser.parse_args()
 
     # Use any random seed, and not the user provided seed
@@ -166,8 +170,9 @@ if __name__ == "__main__":
     
     state_dim = dataset["observations"].shape[1:][0]
     action_dim = dataset["actions"].shape[1:][0] 
+    goal_dim = dataset["infos/goal"].shape[1:][0]
     max_action = float(dataset["actions"].max(axis=0)[0])
-    print(state_dim, action_dim)
+    print(state_dim, action_dim, goal_dim)
     print('Max action: ', max_action)
 
     del dataset
@@ -195,7 +200,21 @@ if __name__ == "__main__":
     )
     setup_logger(file_name, variant=variant, log_dir=args.log_dir + file_name)
 
-    if algo_name == 'BCQ':
+    if algo_name == 'GCBEAR':
+        policy = algos.GoalConditionedBEAR(state_dim, goal_dim, action_dim, max_action, delta_conf=0.1, use_bootstrap=False,
+            version=args.version,
+            lambda_=float(args.lamda),
+            threshold=float(args.threshold),
+            mode=args.mode,
+            num_samples_match=args.num_samples_match,
+            mmd_sigma=args.mmd_sigma,
+            lagrange_thresh=args.lagrange_thresh,
+            use_kl=(True if args.distance_type == "KL" else False),
+            use_ensemble=(False if args.use_ensemble_variance == "False" else True),
+            kernel_type=args.kernel_type,
+            hindsight=args.hindsight)
+
+    elif algo_name == 'BCQ':
         policy = algos.BCQ(state_dim, action_dim, max_action)
     elif algo_name == 'TD3':
         policy = TD3.TD3(state_dim, action_dim, max_action)
