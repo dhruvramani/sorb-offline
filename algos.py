@@ -409,8 +409,8 @@ class GoalConditionedBEAR(object):
             state_np, next_state_np, action, goal, reward, done, mask = replay_buffer.sample(batch_size) # NOTE : edit below
             
             reward = utils.modify_rewards(reward)
-            if(self.hindsight):
-                goal, reward, done = utils.set_hindsight_goal(state_np, goal, reward, done)
+            # if(self.hindsight):
+            #     goal, reward, done = utils.set_hindsight_goal(state_np, goal, reward, done)
             state_np = utils.merge_obs_goal(state_np, goal)
             next_state_np = utils.merge_obs_goal(next_state_np, goal)
 
