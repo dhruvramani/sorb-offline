@@ -201,7 +201,7 @@ if __name__ == "__main__":
     setup_logger(file_name, variant=variant, log_dir=args.log_dir + file_name)
 
     if algo_name == 'GCBEAR':
-        policy = algos.GoalConditionedBEAR(state_dim, goal_dim, action_dim, max_action, delta_conf=0.1, use_bootstrap=False,
+        policy = algos.GoalConditionedBEAR(2, state_dim, goal_dim, action_dim, max_action, delta_conf=0.1, use_bootstrap=False,
             version=args.version,
             lambda_=float(args.lamda),
             threshold=float(args.threshold),
