@@ -411,8 +411,8 @@ class GoalConditionedBEAR(object):
             reward = utils.modify_rewards(reward)
             if(self.hindsight):
                 goal, reward, done = utils.set_hindsight_goal(state_np, goal, reward, done)
-            state_np = merge_obs_goal(state_np, goal)
-            next_state_np = merge_obs_goal(next_state_np, goal)
+            state_np = utils.merge_obs_goal(state_np, goal)
+            next_state_np = utils.merge_obs_goal(next_state_np, goal)
 
             state           = torch.FloatTensor(state_np).to(device)
             action          = torch.FloatTensor(action).to(device)
