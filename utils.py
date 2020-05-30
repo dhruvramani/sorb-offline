@@ -101,7 +101,7 @@ def get_dataset(env_name, h5path=None):
 	return data_dict
 
 class ReplayBuffer(object):
-	def __init__(self, =1000000, state_dim=10, action_dim=4, goal_dim=2):
+	def __init__(self, size=1000000, state_dim=10, action_dim=4, goal_dim=2):
 		self.storage = dict()
 		self.storage['observations'] = np.zeros((size, state_dim), np.float32)
 		self.storage['next_observations'] = np.zeros((size, state_dim), np.float32)
