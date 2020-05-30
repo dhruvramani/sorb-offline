@@ -51,16 +51,18 @@ _ENV_URL_DICT = {
 
 def modify_rewards(rewards_batch):
 	rewards_batch[rewards_batch == 0.0] = -1.0
+	rewards_batch[rewards_batch == 1.0] = 50.0
 	return rewards_batch
 
-def set_hindsight_goal(obs_batch, goal_batch, rewards_batch, done_batch):
-	goal_dim = goal_batch.shape[1:][0]
-	goal_batch[:] = obs_batch[-1][:goal_dim]
-	rewards_batch = modify_rewards(rewards_batch)
-	rewards_batch[-1] = 50.0
-	done_batch[:] = 0.0
-	done_batch[-1] = 1.0
-	return goal_batch, rewards_batch, done_batch
+# NOTE : WRONG
+# def set_hindsight_goal(obs_batch, goal_batch, rewards_batch, done_batch):
+# 	goal_dim = goal_batch.shape[1:][0]
+# 	goal_batch[:] = obs_batch[-1][:goal_dim]
+# 	rewards_batch = modify_rewards(rewards_batch)
+# 	rewards_batch[-1] = 50.0
+# 	done_batch[:] = 0.0
+# 	done_batch[-1] = 1.0
+# 	return goal_batch, rewards_batch, done_batch
 
 def merge_obs_goal(obs_batch, goal_batch):
 	assert obs_batch.shape[0] == goal_batch.shape[0]
@@ -99,16 +101,16 @@ def get_dataset(env_name, h5path=None):
 	return data_dict
 
 class ReplayBuffer(object):
-	def __init__(self, state_dim=10, action_dim=4, goal_dim=2):
+	def __init__(self, =1000000, state_dim=10, action_dim=4, goal_dim=2):
 		self.storage = dict()
-		self.storage['observations'] = np.zeros((1000000, state_dim), np.float32)
-		self.storage['next_observations'] = np.zeros((1000000, state_dim), np.float32)
-		self.storage['actions'] = np.zeros((1000000, action_dim), np.float32)
-		self.storage['rewards'] = np.zeros((1000000, 1), np.float32)
-		self.storage['terminals'] = np.zeros((1000000, 1), np.float32)
-		self.storage['goals'] = np.zeros((1000000, goal_dim), np.float32)
-		self.storage['bootstrap_mask'] = np.zeros((10000000, 4), np.float32)
-		self.buffer_size = 1000000
+		self.storage['observations'] = np.zeros((size, state_dim), np.float32)
+		self.storage['next_observations'] = np.zeros((size, state_dim), np.float32)
+		self.storage['actions'] = np.zeros((size, action_dim), np.float32)
+		self.storage['rewards'] = np.zeros((size, 1), np.float32)
+		self.storage['terminals'] = np.zeros((size, 1), np.float32)
+		self.storage['goals'] = np.zeros((size, goal_dim), np.float32)
+		self.storage['bootstrap_mask'] = np.zeros((size, 4), np.float32)
+		self.buffer_size = size
 		self.ctr = 0
 
 	# Expects tuples of (state, next_state, action, reward, done)

@@ -14,7 +14,7 @@ from logger import create_stats_ordered_dict
 
 #import d4rl
 
-def load_hdf5_mujoco(dataset, replay_buffer):
+def load_hdf5_mujoco(dataset, replay_buffer, hindsight=False):
     """
     Use this loader for the gym mujoco environments
     """
@@ -35,7 +35,7 @@ def load_hdf5_mujoco(dataset, replay_buffer):
     # import ipdb; ipdb.set_trace()
     replay_buffer.buffer_size = N-1
 
-def load_hdf5_others(dataset, replay_buffer):
+def load_hdf5_others(dataset, replay_buffer, hindsight=False):
     """
     Use this loader for the ant_maze and adroit environments
     """
@@ -164,9 +164,9 @@ if __name__ == "__main__":
     dataset = utils.get_dataset(env_name=args.env_name)
     replay_buffer = utils.ReplayBuffer()
     if 'maze' in args.env_name or 'human' in args.env_name or 'cloned' in args.env_name:
-        load_hdf5_others(dataset, replay_buffer)
+        load_hdf5_others(dataset, replay_buffer, args.hindsight)
     else:
-        load_hdf5_mujoco(dataset, replay_buffer)
+        load_hdf5_mujoco(dataset, replay_buffer, args.hindsight)
     
     state_dim = dataset["observations"].shape[1:][0]
     action_dim = dataset["actions"].shape[1:][0] 
@@ -211,8 +211,7 @@ if __name__ == "__main__":
             lagrange_thresh=args.lagrange_thresh,
             use_kl=(True if args.distance_type == "KL" else False),
             use_ensemble=(False if args.use_ensemble_variance == "False" else True),
-            kernel_type=args.kernel_type,
-            hindsight=args.hindsight)
+            kernel_type=args.kernel_type)
 
     elif algo_name == 'BCQ':
         policy = algos.BCQ(state_dim, action_dim, max_action)

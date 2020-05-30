@@ -302,7 +302,7 @@ class GoalConditionedVAE(VAE):
 class GoalConditionedBEAR(object):
     def __init__(self, num_qs, state_dim, goal_dim, action_dim, max_action, delta_conf=0.1, use_bootstrap=True, version=0, lambda_=0.4,
                  threshold=0.05, mode='auto', num_samples_match=10, mmd_sigma=10.0,
-                 lagrange_thresh=10.0, use_kl=False, use_ensemble=True, kernel_type='laplacian', hindsight=False):
+                 lagrange_thresh=10.0, use_kl=False, use_ensemble=True, kernel_type='laplacian'):
         latent_dim = action_dim * 2
         self.actor = GoalConditionedActor(state_dim, goal_dim, action_dim, max_action).to(device)
         self.actor_target = GoalConditionedActor(state_dim, goal_dim, action_dim, max_action).to(device)
@@ -334,7 +334,6 @@ class GoalConditionedBEAR(object):
         self.use_kl = use_kl
         self.use_ensemble = use_ensemble
         self.kernel_type = kernel_type
-        self.hindsight = hindsight
         
         if self.mode == 'auto':
             # Use lagrange multipliers on the constraint if set to auto mode 
@@ -410,7 +409,7 @@ class GoalConditionedBEAR(object):
             
             reward = utils.modify_rewards(reward)
             # if(self.hindsight):
-            #     goal, reward, done = utils.set_hindsight_goal(state_np, goal, reward, done)
+            #   goal, reward, done = utils.set_hindsight_goal(state_np, goal, reward, done)
             state_np = utils.merge_obs_goal(state_np, goal)
             next_state_np = utils.merge_obs_goal(next_state_np, goal)
 
