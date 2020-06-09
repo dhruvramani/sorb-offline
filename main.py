@@ -170,9 +170,13 @@ if __name__ == "__main__":
     
     state_dim = dataset["observations"].shape[1:][0]
     action_dim = dataset["actions"].shape[1:][0] 
-    goal_dim = dataset["infos/goal"].shape[1:][0]
+    print(state_dim, action_dim)
+    
+    if(algo_name == "GCBEAR"):
+        goal_dim = dataset["infos/goal"].shape[1:][0]
+        print(goal_dim)
+    
     max_action = float(dataset["actions"].max(axis=0)[0])
-    print(state_dim, action_dim, goal_dim)
     print('Max action: ', max_action)
 
     del dataset
