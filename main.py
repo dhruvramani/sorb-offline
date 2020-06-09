@@ -115,7 +115,7 @@ def evaluate_policy_discounted(policy, eval_episodes=10):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--env_name", default="maze2d-umaze-v0")              # D4RL gym environment name
+    parser.add_argument("--env_name", default="hopper-medium-v0")              # D4RL gym environment name
     parser.add_argument("--seed", default=0, type=int)                        # Sets Gym, PyTorch and Numpy seeds
     parser.add_argument("--eval_freq", default=5e3, type=float)               # How often (time steps) we evaluate
     parser.add_argument("--max_timesteps", default=1e5, type=float)           # Max time steps to run environment for
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     parser.add_argument("--lamda", default=0.5, type=float)                   # Unused parameter -- please ignore 
     parser.add_argument("--threshold", default=0.05, type=float)              # Unused parameter -- please ignore
     parser.add_argument('--use_bootstrap', default=False, type=bool)          # Whether to use bootstrapped ensembles or plain ensembles
-    parser.add_argument('--algo_name', default="GCBEAR", type=str)            # Which algo to run (see the options below in the main function)
+    parser.add_argument('--algo_name', default="TD3", type=str)            # Which algo to run (see the options below in the main function)
     parser.add_argument('--mode', default='hardcoded', type=str)              # Whether to do automatic lagrange dual descent or manually tune coefficient of the MMD loss (prefered "auto")
     parser.add_argument('--num_samples_match', default=10, type=int)          # number of samples to do matching in MMD
     parser.add_argument('--mmd_sigma', default=20.0, type=float)              # The bandwidth of the MMD kernel parameter
